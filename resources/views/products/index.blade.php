@@ -1,5 +1,8 @@
 @extends('layouts.app')
 
+@section('css')
+@endsection
+
 @section('content')
     <div class="row">
         <div class="col-lg-12 margin-tb">
@@ -20,36 +23,53 @@
         </div>
     @endif
 
-    <table class="table-bordered table">
-        <tr>
-            <th>No</th>
-            <th>Name</th>
-            <th>Details</th>
-            <th width="280px">Action</th>
-        </tr>
-        @foreach ($products as $product)
-            <tr>
-                <td>{{ ++$i }}</td>
-                <td>{{ $product->name }}</td>
-                <td>{{ $product->detail }}</td>
-                <td>
-                    <form action="{{ route('products.destroy', $product->id) }}" method="POST">
-                        <a class="btn btn-info" href="{{ route('products.show', $product->id) }}">Show</a>
-                        @can('product-edit')
-                            <a class="btn btn-primary" href="{{ route('products.edit', $product->id) }}">Edit</a>
-                        @endcan
+    <div class="container mt-5">
+        <table class="table-bordered yajra-datatable table">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Name</th>
+                    <th>Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+@endsection
 
+@section('js')
+    <script type="text/javascript">
+        $(function() {
 
-                        @csrf
-                        @method('DELETE')
-                        @can('product-delete')
-                            <button type="submit" class="btn btn-danger">Delete</button>
-                        @endcan
-                    </form>
-                </td>
-            </tr>
-        @endforeach
-    </table>
+            var columns = [{
+                    data: 'DT_RowIndex',
+                    name: 'DT_RowIndex'
+                },
+                {
+                    data: 'name',
+                    name: 'name',
+                },
+                {
+                    data: 'detail',
+                    name: 'detail',
+                },
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: true,
+                    searchable: true
+                },
+            ];
 
-    {!! $products->links() !!}
+            var table = $('.yajra-datatable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('products.list') }}",
+                columns: columns
+            });
+
+        });
+    </script>
 @endsection

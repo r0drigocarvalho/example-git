@@ -27,5 +27,7 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::group(['middleware' => ['auth']], function () {
     Route::resource('roles', RoleController::class);
     Route::resource('users', UserController::class);
+
+    Route::get('products/list', [ProductController::class, 'getProducts'])->name('products.list');
     Route::resource('products', ProductController::class);
 });

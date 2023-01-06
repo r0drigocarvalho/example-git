@@ -3,7 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use Spatie\Permission\Models\Permission;
+
 use Illuminate\Http\Request;
+
+use Auth;
+use DataTables;
 
 class ProductController extends Controller
 {
@@ -26,9 +31,15 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::latest()->paginate(5);
-        return view('products.index', compact('products'))
-            ->with('i', (request()->input('page', 1) - 1) * 5);
+        //$columns  = \Schema::getColumnListing(app(Product::class)->getTable());
+
+        //$permissions = Permission::whereModelName('product')->first();
+
+        //dd($permissions);
+
+        //dd(Auth::user()->getAllPermissions());
+
+        return view('products.index');
     }
 
     /**
@@ -114,5 +125,24 @@ class ProductController extends Controller
 
         return redirect()->route('products.index')
                         ->with('success', 'Product deleted successfully');
+    }
+
+    public function getProducts(Request $request)
+    {
+        if ($request->ajax()) {
+            $data = Product::latest()->get();
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('action', function ($row) {
+                    $btn = '<a href="'.route('products.show', $row->id).'" class="edit btn btn-info btn-sm">View</a>';
+                    $btn = $btn.'<a href="javascript:void(0)" class="edit btn btn-primary btn-sm">Edit</a>';
+                    $btn = $btn.'<a href="javascript:void(0)" class="edit btn btn-danger btn-sm">Delete</a>';
+
+                    return $btn;
+                })
+                ->rawColumns(['action'])
+                //->removeColumn('detail')
+                ->make(true);
+        }
     }
 }
